@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('product_user_cards', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('product_id')->constrained('products');
+            $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('order_id')->nullable()->constrained('orders');
+            $table->unsignedInteger('qty'); 
+            $table->unsignedSmallInteger('status')->default(1);
             $table->timestamps();
         });
     }

@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('param_product', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('product_id')->constrained('products');
+            $table->foreignId('param_id')->constrained('params');
+            $table->string('value');
             $table->timestamps();
         });
     }

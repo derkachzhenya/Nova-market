@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('product_parents', function (Blueprint $table) {
             $table->id();
+            $table->string('title');
             $table->timestamps();
         });
     }
