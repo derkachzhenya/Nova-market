@@ -5,64 +5,75 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\Category\StoreRequest;
 use App\Http\Requests\Admin\Category\UpdateRequest;
+use App\Http\Resources\Category\CategoryResource;
 use App\Models\Category;
-use Illuminate\Http\Request;
+use App\Services\CategoryService;
+use Inertia\Inertia;
+use Symfony\Component\HttpFoundation\Response;
 
 class CategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $categories = Category::query()
+            ->latest()
+            ->paginate(20);
+        return Inertia::render(
+            'Admin/Category/Index',
+            ['categories' => CategoryResource::collection($categories)]
+        );
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+
+
     public function create()
     {
-        //
+        return Inertia::render('Admin/Category/Create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreRequest $request)
+
+
+    public function store(StoreRequest $request, CategoryService $categoryService)
     {
-        //
+        $data = $request->validated();
+        $category = $categoryService->store($data);
+        return CategoryResource::make($category);
     }
 
-    /**
-     * Display the specified resource.
-     */
+
+
     public function show(Category $category)
     {
-        //
+        return Inertia::render('Admin/Category/Show', [
+            'category' => CategoryResource::make($category)
+        ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+
+
     public function edit(Category $category)
     {
-        //
+        return Inertia::render('Admin/Category/Edit', [
+            'category' => CategoryResource::make($category)
+        ]);
     }
 
-    /**
-     * Upd ate the specified resource in storage.
-     */
-    public function update(UpdateRequest $request, Category $category)
+
+
+    public function update(UpdateRequest $request, Category $category, CategoryService $categoryService)
     {
-        //
+        $data = $request->validated();
+        $category = $categoryService->update($category, $data);
+        return CategoryResource::make($category);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+
+
     public function destroy(Category $category)
     {
-        //
+        $category->delete();
+        return response()->json([
+            'message' => 'success'
+        ], Response::HTTP_OK);
     }
 }

@@ -5,64 +5,76 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ProductParent\StoreRequest;
 use App\Http\Requests\Admin\ProductParent\UpdateRequest;
+use App\Http\Resources\ProductParent\ProductParentResource;
 use App\Models\ProductParent;
+use App\Services\ProductParentService;
+use Inertia\Inertia;
+use Symfony\Component\HttpFoundation\Response;
 
 
 class ProductParentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        $productParents = ProductParent::query()
+            ->latest()
+            ->paginate(20);
+        return Inertia::render(
+            'Admin/ProductParent/Index',
+            ['productParents' => ProductParentResource::collection($productParents)]
+        );
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+
+
     public function create()
     {
-        //
+        return Inertia::render('Admin/ProductParent/Create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(StoreRequest $request)
+
+
+    public function store(StoreRequest $request, ProductParentService $productParentService)
     {
-        //
+        $data = $request->validated();
+        $productParent = $productParentService->store($data);
+        return ProductParentResource::make($productParent);
     }
 
-    /**
-     * Display the specified resource.
-     */
+
+
     public function show(ProductParent $productParent)
     {
-        //
+        return Inertia::render('Admin/ProductParent/Show', [
+            'productParent' => ProductParentResource::make($productParent)
+        ]);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+
+
     public function edit(ProductParent $productParent)
     {
-        //
+        return Inertia::render('Admin/ProductParent/Edit', [
+            'productParent' => ProductParentResource::make($productParent)
+        ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdateRequest $request, ProductParent $productParent)
+
+
+    public function update(UpdateRequest $request, ProductParent $productParent, ProductParentService $productParentService)
     {
-        //
+        $data = $request->validated();
+        $productParent = $productParentService->update($productParent, $data);
+        return ProductParentResource::make($productParent);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+
+
     public function destroy(ProductParent $productParent)
     {
-        //
+        $productParent->delete();
+        return response()->json([
+            'message' => 'success'
+        ], Response::HTTP_OK);
     }
 }
