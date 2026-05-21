@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
         $user = User::firstOrCreate([
             'email' => $user['email'],
         ], $user);
+        
 
         $role = Role::firstOrCreate(['title'=>RoleEnum::ADMIN->value]);
 
